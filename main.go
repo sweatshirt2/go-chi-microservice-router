@@ -1,35 +1,16 @@
 package main
 
 import (
-	"net/http"
+	"context"
 
-	"github.com/go-chi/chi/v5"
-	"github.com/go-chi/chi/v5/middleware"
+	"github.com/sweatshirt2/go-analytics/application"
 )
 
 func main() {
-	println("Starting app...")
+	println("Starting App...")
 
-	// creating a chi router instance
-	router := chi.NewRouter()
-	// applying the chi middleware
-	router.Use(middleware.Logger)
-
-	// defining a chi route
-	router.Get("/hello", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("Hello World"))
-	})
-
-	// creating a net/http instance
-	// using reference of the http.Server even though go implicitly dereferences the instance on each method call
-	// why you ask? ask chatgpt
-	server := &http.Server{
-		Addr: ":3000",
-		Handler: router,
-	}
-
-	println("Starting server...")
-	err := server.ListenAndServe()
+	app := application.NewApp()
+	err := app.Start(context.TODO())
 
 	// explicitly panicking because well... it's go
 	if err != nil {
