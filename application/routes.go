@@ -1,10 +1,9 @@
 package application
 
 import (
-	"net/http"
-
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	"github.com/sweatshirt2/go-analytics/handler"
 )
 
 func loadRoutes() *chi.Mux {
@@ -13,10 +12,17 @@ func loadRoutes() *chi.Mux {
 	// applying the chi middleware
 	router.Use(middleware.Logger)
 
-	// defining a chi route
-	router.Get("/hello", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("Hello World"))
-	})
+	router.Route("/orders", loadOrderRoutes)
 
 	return router
+}
+
+func loadOrderRoutes(router chi.Router) {
+	orderController := handler.OrderController{}
+
+	router.Post("/", orderController.Create)
+	router.Get("/", orderController.GetAll)
+	router.Get("/{id}", orderController.GetById)
+	router.Put("/{id}", orderController.Update)
+	router.Delete("/{id}", orderController.Delete)
 }
