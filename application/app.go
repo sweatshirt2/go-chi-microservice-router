@@ -15,13 +15,15 @@ type App struct {
 }
 
 func NewApp() *App {
-	router := loadRoutes()
-  rds := redis.NewClient(&redis.Options{
+	rds := redis.NewClient(&redis.Options{
 		Addr: "localhost:6379",
 		DB: 9,
 	})
 
-	app := &App{router: router, rds: rds}
+	app := &App{
+		rds: rds,
+	}
+	app.loadRoutes()
 
 	return app
 }

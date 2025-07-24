@@ -4,21 +4,24 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/sweatshirt2/go-analytics/handler"
+	repository "github.com/sweatshirt2/go-analytics/repositories"
 )
 
-func loadRoutes() *chi.Mux {
+func (app *App) loadRoutes() {
 	// creating a chi router instance
 	router := chi.NewRouter()
 	// applying the chi middleware
 	router.Use(middleware.Logger)
 
-	router.Route("/orders", loadOrderRoutes)
+	router.Route("/orders", app.loadOrderRoutes)
 
-	return router
+	app.router = router
 }
 
-func loadOrderRoutes(router chi.Router) {
-	orderController := handler.OrderController{}
+func (a *App) loadOrderRoutes(router chi.Router) {
+	orderController := handler.OrderController{
+		Repo: &repository.OrderRepo{},
+	}
 
 	router.Post("/", orderController.Create)
 	router.Get("/", orderController.GetAll)

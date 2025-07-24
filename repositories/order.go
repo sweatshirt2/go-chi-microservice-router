@@ -15,7 +15,7 @@ type OrderRepo struct {
 
 }
 
-func orderIdKey(id uint64) string {
+func OrderIdKey(id uint64) string {
 	return fmt.Sprintf("order:%d", id)
 }
 
@@ -26,7 +26,7 @@ func (r *OrderRepo) Insert(ctx context.Context, order models.Order) error {
 		return fmt.Errorf("failed to encode order: %w", err)
 	}
 
-	key := orderIdKey(order.OrderId)
+	key := OrderIdKey(order.OrderId)
 
 	res := r.Client.SetNX(ctx, key, string(data), 0)
 	if err := res.Err(); err != nil {
@@ -37,10 +37,10 @@ func (r *OrderRepo) Insert(ctx context.Context, order models.Order) error {
 }
 
 func (r *OrderRepo) FindById(ctx context.Context, id uint64) (models.Order, error) {
-	key := orderIdKey(id)
+	key := OrderIdKey(id)
 
 	value, err := r.Client.Get(ctx, key).Result()
-	
+
 	if errors.Is(err, redis.Nil) {
 		return models.Order{}, errors.New("Order does not exist")
 	}
