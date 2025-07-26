@@ -53,8 +53,7 @@ func (app *App) Start(ctx context.Context) error {
 	ch := make(chan error, 1)
 
 	go func ()  {
-		err = server.ListenAndServe()
-		if err != nil {
+		if err = server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			ch <- fmt.Errorf("failed to start server: %w", err)
 		}
 
@@ -62,10 +61,10 @@ func (app *App) Start(ctx context.Context) error {
 	}()
 
 	// ch_err, open := <-ch
-	ch_err := <-ch
+	// ch_err := <-ch
 
 	select {
-	case ch_err = <-ch:
+	case ch_err := <-ch:
 		return ch_err
 	case <-ctx.Done():
 		timeout, cancel := context.WithTimeout(context.Background(), time.Second*10)

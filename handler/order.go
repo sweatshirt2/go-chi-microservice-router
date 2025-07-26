@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"math/rand"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/google/uuid"
@@ -25,6 +26,7 @@ func (o *OrderController) Create(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		print("error parsing json...")
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
@@ -60,6 +62,43 @@ func (o *OrderController) Create(w http.ResponseWriter, r *http.Request) {
 
 func (o *OrderController) GetAll(w http.ResponseWriter, r *http.Request) {
 	println("getting all orders...")
+	cursorStr := r.URL.Query().Get("cursor")
+
+	if cursorStr == "" {
+		cursorStr = "0"
+	}
+
+	const decimal = 10
+	const bitSize = 64
+
+	cursor, err := strconv.ParseUint(cursorStr, decimal, bitSize)
+
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	const size = 50
+
+	print(cursor)
+
+	w.WriteHeader(http.StatusOK)
+
+	var body struct {
+		Name string `json:"name"`
+	}
+
+	body.Name = "abebe"
+
+	val, err := json.Marshal(body)
+
+	if err != nil {
+		fmt.Println("failed to marshall orders")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	w.Write(val)
 }
 
 func (o *OrderController) GetById(w http.ResponseWriter, r *http.Request) {

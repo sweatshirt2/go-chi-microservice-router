@@ -20,7 +20,9 @@ func (app *App) loadRoutes() {
 
 func (a *App) loadOrderRoutes(router chi.Router) {
 	orderController := handler.OrderController{
-		Repo: &repository.OrderRepo{},
+		Repo: &repository.OrderRepo{
+			Client: a.rds,
+		},
 	}
 
 	router.Post("/", orderController.Create)
