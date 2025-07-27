@@ -74,12 +74,16 @@ func (r *OrderRepo) FindById(ctx context.Context, id uint64) (models.Order, erro
 func (r *OrderRepo) Delete(ctx context.Context, id uint64) error {
 	key := OrderIdKey(id)
 	tx := r.Client.TxPipeline()
-	err := tx.Del(ctx, key).Err()
 
-	if errors.Is(err, redis.Nil) {
-		tx.Discard()
-		return ErrNotExist
-	} else if err != nil {
+	// if count, err := tx.Del(ctx, key).Result(); count == 0 {
+	// 	tx.Discard()
+	// 	return ErrNotExist
+	// } else if err != nil {
+	// 	tx.Discard()
+	// 	return fmt.Errorf("error deleting order: %w", err)
+	// }
+
+	if _, err := tx.Del(ctx, key).Result(); err != nil {
 		tx.Discard()
 		return fmt.Errorf("error deleting order: %w", err)
 	}
@@ -118,7 +122,7 @@ func (r *OrderRepo) Update(ctx context.Context, order models.Order) error {
 
 type FindAllPage struct {
 	Size uint
-	Offset uint
+	Offset uint64
 }
 
 type FindResult struct {
